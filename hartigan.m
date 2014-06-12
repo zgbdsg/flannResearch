@@ -6,13 +6,16 @@ Ccnt = zeros(1,k);
 % use bsxfun to compute pairwise distances between two sets of vectors X and C (one row is one sample)
 dist = -bsxfun(@minus,bsxfun(@minus,2*X*C',sum(X.^2,2)),sum(C.^2,2)');
 [dist, idx] = min(dist,[],2); % find minimum distance values and indexes
-fprintf('Initialization, cost = %f\n',sum(full(dist)));
+fprintf('Initialization, cost = %f\n',sum(dist));
 
 for i=1:k
     pos = find(idx==i);
     Ccnt(i) = length(pos);
     C(i,:) = mean(X(pos,:));
 end
+
+beforeSum = 0;
+sumD = 0;
 
 for cnt=1:count
     for id=1:n
@@ -44,9 +47,15 @@ for cnt=1:count
         Ccnt(i) = length(pos);
         C(i,:) = mean (X(pos,:));
     end
+    
+    beforeSum = sumD;
     sumD = 0;
     for i=1:n
         sumD = sumD + sum((X(i,:)-C(idx(i),:)).^2);
+    end
+    
+    if abs(beforeSum-sumD) < 0.01
+        return
     end
     fprintf('Iter %d finished, cost = %f\n',cnt,sumD);
 end

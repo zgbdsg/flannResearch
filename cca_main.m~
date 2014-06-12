@@ -2,46 +2,16 @@ clear;
 clc;
 addpath('flann')
 
-load('data/USPS.mat');
+load('data/COIL20.mat');
 nClass = length(unique(gnd));
 newfea = NormalizeFea(fea);
 
 result_L = [];
 result_N = [];
 result_X = [];
-result_K = [];
+result_k = [];
 
 rand('twister',1);
-
-for a=1:10
-nitem = size(fea,1);
-
-X = zeros(nitem,nitem);
-knnsize = round(nitem/20);
-%knnsize = 5;
-params.algorithm = 'kdtree';
-params.trees = 8;
-params.cores = 4;
-params.checks = 1024;
-
-tic;
-
-dic_ind = flann_search(newfea',newfea',knnsize,params);
-for rows=1:nitem
-    X (dic_ind(:,rows),rows) = 1;
-end
-
-toc;
-
-
-[label, center] = litekmeans(X',nClass,'Replicates',100);
-[AC,MIhat] = Evaluate(label,gnd);
-disp(['Sparse kmeans ',' MIhat: ',num2str(MIhat),'AC:  ',num2str(AC)]);
-result_K = [result_K;AC];
-end
-
-return;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 for a=1:10
     disp(['the ',num2str(a),' iteration']);
@@ -93,7 +63,6 @@ toc;
 disp(['Sparse hartigan ',' MIhat: ',num2str(MIhat),'AC:  ',num2str(AC)]);
 result_X = [result_X;AC];
 end
-
 
 mean(result_L)
 mean(result_N)
